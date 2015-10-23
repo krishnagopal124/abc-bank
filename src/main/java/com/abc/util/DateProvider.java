@@ -1,4 +1,4 @@
-package com.abc;
+package com.abc.util;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -15,4 +15,11 @@ public class DateProvider {
     public Date now() {
         return Calendar.getInstance().getTime();
     }
+
+//	public Date oneYearFromNow() {
+//		// TODO Auto-generated method stub
+//		Calendar nextYearToday = Calendar.getInstance();
+//		nextYearToday.add(Calendar.YEAR, 1);
+//        return nextYearToday.getTime();
+//	}
 }

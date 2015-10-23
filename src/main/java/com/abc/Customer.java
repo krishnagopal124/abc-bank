@@ -1,9 +1,12 @@
 package com.abc;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static java.lang.Math.abs;
+import com.abc.util.BigDecimalUtil;
+
+import java.math.BigDecimal;
 
 public class Customer {
     private String name;
@@ -22,27 +25,38 @@ public class Customer {
         accounts.add(account);
         return this;
     }
-
+    
     public int getNumberOfAccounts() {
         return accounts.size();
     }
 
-    public double totalInterestEarned() {
-        double total = 0;
+    public void transferMoney(int fromAccNum, int toAccNum, BigDecimal amount) {
+    	if(fromAccNum>=accounts.size() || toAccNum >= accounts.size()){
+    		throw new IndexOutOfBoundsException("Account does not exist for the account number: "+((fromAccNum>=accounts.size())?fromAccNum: toAccNum));
+    	}
+    	else if (fromAccNum != toAccNum){
+    		Account fromAccount = accounts.get(fromAccNum);
+    		Account toAccount = accounts.get(toAccNum);
+        	fromAccount.withdraw(amount);
+        	toAccount.deposit(amount);
+    	}
+    }
+    public BigDecimal totalInterestEarned() {
+        BigDecimal total = BigDecimal.ZERO;
         for (Account a : accounts)
-            total += a.interestEarned();
+            total = a.interestEarned();
         return total;
     }
 
     public String getStatement() {
         String statement = null;
         statement = "Statement for " + name + "\n";
-        double total = 0.0;
+        BigDecimal total = BigDecimal.ZERO;
         for (Account a : accounts) {
             statement += "\n" + statementForAccount(a) + "\n";
-            total += a.sumTransactions();
+            total = total.add(a.sumTransactions());
         }
-        statement += "\nTotal In All Accounts " + toDollars(total);
+        statement += "\nTotal In All Accounts " + BigDecimalUtil.toDollars(total);
         return statement;
     }
 
@@ -63,16 +77,16 @@ public class Customer {
         }
 
         //Now total up all the transactions
-        double total = 0.0;
+        BigDecimal total = BigDecimal.ZERO;
         for (Transaction t : a.transactions) {
-            s += "  " + (t.amount < 0 ? "withdrawal" : "deposit") + " " + toDollars(t.amount) + "\n";
-            total += t.amount;
+        	BigDecimal transactionAmt = t.amount;
+        	
+            s += "  " + (transactionAmt.compareTo(BigDecimal.ZERO) < 0 ? "withdrawal" : "deposit") + " " + BigDecimalUtil.toDollars(transactionAmt) + "\n";
+            total = total.add(transactionAmt);
         }
-        s += "Total " + toDollars(total);
+        s += "Total " + BigDecimalUtil.toDollars(total);
         return s;
     }
 
-    private String toDollars(double d){
-        return String.format("$%,.2f", abs(d));
-    }
+   
 }
